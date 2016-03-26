@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style>
+		
+	</style>
+</head>
+<body>
+
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script>
+		var w=1024, h=500
+		var dataset=[];
+		for(var i=0; i<30; i++){
+			var x=Math.floor(Math.random()*250),
+				y=Math.floor(Math.random()*250);
+			dataset.push([x, y]);
+		}
+		var xScale=d3.scale.linear().domain([d3.max(dataset, function(d){ return d[0]}), 0]).range([0, w]);
+		var yScale=d3.scale.linear().domain([d3.max(dataset, function(d){ return d[1]}), 0]).range([0, h]);
+		var lineXscale=d3.scale.ordinal().domain(d3.range(dataset.length)).rangeBands([0, w], 0.5);
+
+		var paper= d3.select('body').append('svg')
+			.attr({'width': w, 'height': h});
+		var circle=paper.selectAll('circle')
+			.data(dataset).enter().append('circle').
+			attr({
+				'cx': function(d){
+						return xScale(d[0]);
+					},
+				'cy': function(d){ return yScale(d[1])},
+				'r': function(d){return Math.sqrt(d[1])},
+			});
+		paper.selectAll('text').data(dataset).enter().append('text').text(function(d){ return d;})
+				.attr({
+					'x': function(d, i){ return xScale(d[0]);},
+					'y': function(d, i){return yScale(d[1]);},
+					'font-family': 'georgia, helvetica',
+					'font-size': '1em',
+					'fill': 'white',
+					'text-anchor': 'middle'
+				});
+		var xAxis=d3.svg.axis().scale(xScale).orient('bottom').ticks(20);
+		paper.append('g').call(xAxis);
+
+
+
+	</script>
+</body>
+</html>
