@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hello Bubble Chart</title>
+    <meta charset="utf-8">
+    <style>
+        .active{
+            stroke: hsl(180, 70%, 20%);
+            stroke-width: 5px;
+            stroke-dasharray: 20, 10, 5, 5, 5, 10;
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="1200" height="350"></svg>
+
+    <script src="https://dl.dropboxusercontent.com/u/50502234/jquery.min.js"></script>
+    <script src="./js/d3.min.js"></script>
+    <script>
+        var svg = d3.select('svg'),
+            width = +svg.attr('width'),
+            height = +svg.attr('height'),
+            formatting= d3.format(',d');
+
+        function classes(root) {
+            var classes = [];
+
+            function recurse(name, node) {
+                if (node.children) 
+                    node.children.forEach(function(child) {
+                    recurse(node.name, child);
+                });
+                else classes.push({
+                  nodeId: node.main_type,
+                  packageName: name,
+                  className: node.name,
+                  value: node.count,
+                  cx: Math.round(Math.random() * (width - (node.count/100) *2)+(node.count/100)),
+                  cy: Math.round(Math.random() * (height - (node.count/100) *2)+(node.count/100))
+                });
+            }
+            recurse(null, root);
+
+            return { children: classes};
+        }
+
+
+        d3.json('./json/opendata.json', function(error, root){
+            var color=d3.scale.category20c();
+            if (error) throw error;
+
+            var nodes = svg.selectAll('g')
+                        .data(classes(root).children).enter().append('g')
+                        .attr('class', 'node');
+            nodes.append('circle')
+            .attr({
+                'cx': function(d){ return d.cx},
+                'cy': function(d){ return d.cy},
+                'r' : function(d){ return d.value/100},
+                'fill': function(d, i){ return color(i);}
+            })
+            .call(d3.behavior.drag()
+                .on('dragstart', dragstarted)
+                .on('drag', dragmoved)
+                .on('dragend', dragended));
+
+            function dragstarted(){
+                d3.select(this).classed('active', true);
+            }
+
+            function dragmoved(evt){
+                d3.select(this)
+                .attr({'cx': evt.x = d3.event.x,
+                       'cy': evt.y = d3.event.y})
+            }
+
+            function dragended(evt){
+                d3.select(this).classed('active', false);
+            }
+        })
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+{
+    "name": "cluster",
+    "children": [{
+        "main_type" : 1,
+        "name" : "生活地圖",
+        "count" : 3000
+    }, {
+        "main_type" : 2,
+        "name" : "觀光旅遊",
+        "count" : 2500
+    }, {
+        "main_type": 3,
+        "name" : "災害防救",
+        "count" : 2200
+    }, {
+        "main_type": 4,
+        "name": "風險管理",
+        "count": 1800
+    }, {
+        "main_type": 5,
+        "name": "食品",
+        "count": 3500
+    }, {
+        "main_type": 6,
+        "name": "管制藥品",
+        "count": 680
+    }, {
+        "main_type": 7,
+        "name": "認證實驗室",
+        "count": 7200
+    }, {
+        "main_type": 8,
+        "name": "醫療器材",
+        "count": 1840
+    }, {
+        "main_type": 9,
+        "name": "藥品",
+        "count": 2476
+    }]
+}
