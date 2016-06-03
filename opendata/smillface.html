@@ -43,81 +43,80 @@
             'fill': 'none'
           })
 
-     function face_factory(classname, data, x, y, r){
-        var face = d3.select('#charts')
-                    .append('g')
-                    .data([{'x': x, 'y': y}])
+    function face_factory(classname, data, x, y, r){
+      var face = d3.select('#charts')
+                  .append('g')
+                  .data([{'x': x, 'y': y}])
+                  .attr({
+                      'class': classname,
+                      'transform': 'translate('+ x +','+ y +')'
+                  }).call(drag);
+
+      var head_color=d3.scale.linear().domain([0, 1])
+                      .interpolate(d3.interpolateHsl)
+                      .range(['hsl(200, 60%, 50%), hsl(250, 100%, 50%)']);
+      var head = face.append('circle')
                     .attr({
-                        'class': classname,
-                        'transform': 'translate('+ x +','+ y +')'
-                    }).call(drag);
+                      'class': 'head',
+                      'fill': function(d){ return head_color(data.x);},
+                      'fill-opacity': .8,
+                      'stroke': 'hsl(185, 100%, 20%)',
+                      'stroke-width': 4,
+                      'r': r
+                    });
 
-            var head_color=d3.scale.linear().domain([0, 1])
-                            .interpolate(d3.interpolateHsl)
-                            .range(['hsl(200, 60%, 50%), hsl(250, 100%, 50%)']);
-            var head = face.append('circle')
+      var mouth_x = [0, .5, 1],
+          mouth_y = [.5, data.y, .5];
+      var mouth_x_range = d3.scale.linear()
+                           .domain([0, 1])
+                           .range([-r/2, r/2]);
+      var mouth_y_range = d3.scale.linear()
+                           .domain([0, 1]).range([-r/2, r/2]);
+      var mouth_line = d3.svg.line()
+                        .x(function(d, i){ return mouth_x_range(d);})
+                        .y(function(d, i){ return mouth_y_range(mouth_y[i]);})
+                        .interpolate('basis');
+
+      face.append('path')
+          .attr({
+            'd': mouth_line(mouth_x),
+            'y': 0,
+            'stroke': '#000',
+            'stroke-linecap': 'round',
+            'transform': 'translate('+[0, r/3]+')',
+            'stroke-width': 3,
+            'fill': 'none'
+          })
+
+      var eyer = r/10 + data.z *(r/3);
+
+      var left_eye = face.append('circle')
                         .attr({
-                            'class': 'head',
-                            'fill': function(d){ return head_color(data.x);},
-                            'fill-opacity': .8,
-                            'stroke': 'hsl(185, 100%, 20%)',
-                            'stroke-width': 4,
-                            'r': r
+                          'class': 'eyes',
+                          'stroke': '#000',
+                          'fill': 'none',
+                          'stroke-width': 4,
+                          'transform': 'translate('+ [-r/2.5, -r/3] +')',
+                          'r': eyer
                         });
+      var right_eye = face.append('circle')
+                         .attr({
+                           'class': 'eyes',
+                            'stroke': '#000',
+                            'fill': 'none',
+                            'stroke-width': 4,
+                            'transform': 'translate('+ [r/2.5, -r/3] +')',
+                            'r': eyer
+                          });
+    }
 
-            var mouth_x = [0, .5, 1],
-                mouth_y = [.5, data.y, .5];
-
-            var mouth_x_range = d3.scale.linear()
-                                .domain([0, 1])
-                                .range([-r/2, r/2]);
-            var mouth_y_range = d3.scale.linear()
-                                .domain([0, 1]).range([-r/2, r/2]);
-            var mouth_line = d3.svg.line()
-                             .x(function(d, i){ return mouth_x_range(d);})
-                             .y(function(d, i){ return mouth_y_range(mouth_y[i]);})
-                             .interpolate('basis');
-
-            face.append('path')
-                .attr({
-                    'd': mouth_line(mouth_x),
-                    'y': 0,
-                    'stroke': '#000',
-                    'stroke-linecap': 'round',
-                    'transform': 'translate('+[0, r/3]+')',
-                    'stroke-width': 3,
-                    'fill': 'none'
-            })
-
-                var eyer = r/10 + data.z *(r/3);
-
-                var left_eye = face.append('circle')
-                                .attr({
-                                    'class': 'eyes',
-                                    'stroke': '#000',
-                                    'fill': 'none',
-                                    'stroke-width': 4,
-                                    'transform': 'translate('+ [-r/2.5, -r/3] +')',
-                                    'r': eyer
-                                });
-                var right_eye = face.append('circle')
-                                .attr({
-                                    'class': 'eyes',
-                                    'stroke': '#000',
-                                    'fill': 'none',
-                                    'stroke-width': 4,
-                                    'transform': 'translate('+ [r/2.5, -r/3] +')',
-                                    'r': eyer
-                                });
-     }
-
-     for(var i=0; i<7; i++){
-        var r= 20+Math.random()*50;
-        var data = {'x': Math.random(), 'y': Math.random(), 'z':Math.random(), 'w':Math.random()};
-        x = Math.random() * w;
-        y = Math.random() * h;
-        face_factory('face'+i, data, x, y, r);
-     }
+    for(var i=0; i<7; i++){
+      var r= 20+Math.random()*50;
+      var data = {'x': Math.random(), 'y': Math.random(), 'z':Math.random(), 'w':Math.random()};
+      x = Math.random() * w;
+      y = Math.random() * h;
+      face_factory('face'+i, data, x, y, r);
+    }
     </script>
 </body>
 
