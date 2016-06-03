@@ -67,12 +67,13 @@
   			storke: 'hsl(250, 60%, 70%)'
   		})
 
-  		nodes.append('svg:image')
+  		nodes.append('image')
   		.attr({
   			'x': function(d){ return d.x-(d.r/2)},
   			'y': function(d){ return d.y},
   			'width': function(d){ return d.r},
   			'height': function(d){ return d.r},
+        'opacity': 0.6,
   			'xlink:href': './images/unnamed.png'
   		})
 
@@ -81,7 +82,7 @@
   			x: function(d){ return d.x},
   			y: function(d){ return d.y},
   			'text-anchor': 'middle',
-  			'fill': '#fff'
+  			'fill': '#000'
   		}).text(function(d){ return d.className})
   	})
   </script>

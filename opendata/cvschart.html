@@ -14,16 +14,17 @@
 </head>
 
 <body>
-    <svg viewBox="0 0 1300 530" preserveAspectRatio="xMinYMin slice"></svg> 
-    <!--If you are already setup viewbox, you can ignore width and height to automatically meet the browser.-->
+    <canvas width="1200" height="500"></canvas> 
 
     <script src="https://dl.dropboxusercontent.com/u/50502234/jquery.min.js"></script>
     <script src="./js/d3.min.js"></script>
     <script>
-        var svg = d3.select('svg'),
-            width = 1200,
-            height = 350,
+        var canvas = d3.select('canvas'),
+            context=canvas.node().getContext('2d'),
+            width = canvas.property('width'),
+            height = canvas.property('height'),
             formatting= d3.format(',d');
+        var color=d3.scale.category20c(), nodes;
 
         function classes(root) {
             var classes = [];
@@ -42,50 +43,55 @@
                   cy: Math.round(Math.random() * (height - (node.count/100) *2)+(node.count/100))
                 });
             }
-            recurse(null, root);
 
+            recurse(null, root);
             return { children: classes};
         }
 
+        function render(){
+            context.clearRect(0, 0, width, height);
+            for(var i=0, len=nodes.length, node; i < len; i++){
+                node=nodes[i];
+                context.beginPath();
+                context.moveTo(node.cx + node.value/100, node.cy)
+                context.arc(node.cx, node.cy, node.value/100, 0, 2*Math.PI);
+                context.fillStyle = color(node.nodeId);
+                context.fill();
+
+                if(node.active){
+                    context.lineWidth = 2;
+                    context.stroke();
+                }
+            }
+        }
 
         d3.json('./json/opendata.json', function(error, root){
-            var color=d3.scale.category20c();
             if (error) throw error;
 
-            var nodes = svg.selectAll('g')
-                        .data(classes(root).children)
-                        .enter().append('g')
-                        .attr({'class': 'node'});
-            nodes.append('circle')
-            .attr({
-                'cx': function(d){ return d.cx},
-                'cy': function(d){ return d.cy},
-                'r' : function(d){ return d.value/100},
-                'fill': function(d, i){ return color(i);}
-            })
-            // .call(d3.behavior.drag()
-            //     .on('dragstart', dragstarted)
-            //     .on('drag', dragmoved)
-            //     .on('dragend', dragended));
+            nodes = classes(root).children;
+            render();
+            
+            canvas.call(d3.behavior.zoom()
+                .on('dragstart', dragstarted)
+                .on('drag', dragmoved)
+                .on('dragend', dragended))
 
-            nodes.append('image')
-            .attr({
-                'x': function(d){ return d.cx-(d.value/100/2)},
-                'y': function(d){ return d.cy},
-                'width': function(d){ return d.value/100 < 30 ? 0 : d.value/100},
-                'height': function(d){ return d.value/100 < 30 ? 0 : d.value/100},
-                'opacity': 0.6,
-                'xlink:href': './images/unnamed.png'
-            });
+            // nodes.append('circle')
+            // .attr({
+            //     'cx': function(d){ return d.cx},
+            //     'cy': function(d){ return d.cy},
+            //     'r' : function(d){ return d.value/100},
+            //     'fill': function(d, i){ return color(i);}
+            // })
 
-            nodes.append('text')
-            .attr({
-                x: function(d){ return d.cx},
-                y: function(d){ return d.cy},
-                'text-anchor': 'middle',
-                'font-weight': 900,
-                'fill': '#000'
-            }).text(function(d){ return d.className});
+            function dragsubject(){
+                for (var i=nodes.length-1, node, x, y; i >= 0; i--){
+                    node=nodes[i];
+                    x=node.x-d3.event.x;
+                    y=node.y-d3.event.y;
+                    if (x * x + y * y < (node.value/100) * (node.value/100)) return node;
+                }
+            }
 
             function dragstarted(){
                 d3.select(this).classed('active', true).attr('r', 150);
