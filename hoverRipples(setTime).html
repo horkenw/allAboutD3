@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>hover ripples</title>
+	<link rel="stylesheet" href="">
+</head>
+<style>
+	body {
+	  margin: 0;
+	  background: hsl(0, 0%, 75%);
+	  min-width: 960px;
+	}
+
+</style>
+<body>
+	<script src="opendata/js/d3.min.js"></script>
+	<script>
+		var width = Math.max(960, innerWidth),
+				height = Math.max(500, innerHeight), i = 0;
+
+		var x1 = width / 2,
+				y1 = height / 2,
+				x0 = x1,
+				y0 = y1,
+				i = 0,
+				r = 200,
+				τ = 2 * Math.PI;
+
+		var cvs = d3.select('body').append('canvas')
+							.attr({
+								'width': width,
+								'height': height
+							}).on('ontouchstart' in document ? 'touchmove' : 'mousemove', move);
+
+		var ctx = cvs.node().getContext('2d');
+		ctx.globalCompositeOperation = 'lighter';
+		ctx.lineWidth = 2;
+
+		d3.timer(function(){
+			ctx.clearRect(0, 0, width, height);
+
+			var z = d3.hsl(++i % 360, 1, .5).rgb(),
+					c = 'rgba('+z.r+','+z.g+','+z.b+',',
+					x = x0 += (x1-x0) * .1,
+					y = y0 += (y1-y0) * .1;
+
+			d3.select({}).transition()
+				.duration(2000)
+				.ease(Math.sqrt)
+				.tween('circle', function(){
+					return function(t){
+						ctx.strokeStyle = c + (1 - t) + ")";
+	          ctx.beginPath();
+	          ctx.arc(x, y, r * t, 0, τ);
+	          ctx.stroke();
+					}
+				})
+		})
+
+		function move(){
+			var mouse=d3.mouse(this);
+
+			x1 = mouse[0];
+			y1 = mouse[1];
+			
+			d3.event.preventDefault();
+		}
+	</script>
+</body>
+</html>

@@ -24,6 +24,7 @@
             width = 1200,
             height = 350,
             formatting= d3.format(',d');
+        var color=d3.scale.category20c();
 
         var drag = d3.behavior.drag()
                   .on('drag', function(d, i){
@@ -58,7 +59,6 @@
 
 
         d3.json('./json/opendata.json', function(error, root){
-            var color=d3.scale.category20c();
             if (error) throw error;
 
             var nodes = svg.selectAll('g')
